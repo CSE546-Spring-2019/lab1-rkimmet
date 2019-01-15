@@ -28,6 +28,7 @@ int main(int argc, char** argv){
         exit(1);
     }
     rc=readFile(inputFile,searchString,count);
+    out=printFile(outputFile,count,inputFile);
     return 0;
 }
 /*
@@ -70,7 +71,7 @@ int compare(char* buffer, char*ss,int count){
     return count;
     }
 }
-int outputfile(FILE *outputfile, int count, FILE *input){
+int printFile(FILE *outputfile, int count, FILE *input){
     int size=ftell(input);
     char* sizee="The file size is";
     char*counts= "The number of matching words is";
