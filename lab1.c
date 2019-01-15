@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-int readFile(FILE  *inputfile, char *searchString, int count);
-int printFile(FILE *outputfile, int count, FILE *input);
+int readFile(FILE  *inputfile, char *searchString, int count, FILE *out);
+int printFile(int count, FILE *input);
 int compare(char* buffer, char*searchString, int count);
 int rescan(FILE inputfile);
 
@@ -23,30 +23,30 @@ int main(int argc, char** argv){
         printf("Could not open the file");
         exit(1);
     }
-    if((outputFile=fopen(argv[3],"w"))==NULL){
+    if((outputFile=fopen(argv[3],"wb"))==NULL){
         printf("Could not open the file");
         exit(1);
     }
-    rc=readFile(inputFile,searchString,count);
-    out=printFile(outputFile,count,inputFile);
+    rc=readFile(inputFile,searchString,count,outputFile);
+    out=printFile(count,inputFile);
+    fclose(outputFile);
     return 0;
 }
 /*
  *reads the file chunks into the buffer and will then compare them with the comparefunction to the search string
  */
-int readFile(FILE *inputfile, char *searchString,int count){
+int readFile(FILE *inputfile, char *searchString,int count, FILE *out){
     char buff[100];
     while((fread(buff,1,100,inputfile))!=0){
+        fwrite(buff,1,100,out);
         count=compare(buff,searchString,count);
-        printf("%c\n",buff[0]);
-        printf("%ld\n",ftell(inputfile));
     }
     
    return 0;
 }
 int compare(char* buffer, char*ss,int count){
     int i=0;
-    int stingmatch=strlen(ss);
+    int stringmatch=sizeof(ss);
     int potential=0;
     int matchingchars=0;
     int sspos=0;
@@ -63,21 +63,18 @@ int compare(char* buffer, char*ss,int count){
         }else{
             sspos=0;
         }
-       /* if(matchingchars==stringmatch){
+        if(matchingchars==stringmatch){
             count++;
             sspos=0;
             matchingchars=0;
-        }*/
+        }
     return count;
     }
 }
-int printFile(FILE *outputfile, int count, FILE *input){
+int printFile(int count, FILE *input){
     int size=ftell(input);
-    char* sizee="The file size is";
-    char*counts= "The number of matching words is";
-    fputs(sizee, outputfile);
-    fputs(counts,outputfile);
-    fclose(outputfile);
+    printf("The size is %d\n",size);
+    printf("matching number of words is %d\n",count);
     fclose(input);
     return 0;
 }
